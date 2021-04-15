@@ -19,7 +19,7 @@ mode = sys.argv[1]
 if mode == "config":
 	#execute configuration
 	print(bcolors.GREEN + "\nInitializing configuration procedure ...\n" + bcolors.RESET)
-	print("These are the available USB devices. Pick your MAIN keyboard(s):\n")
+	print("These are the available USB devices. Pick your" + bcolors.YELLOW + " MAIN " + bcolors.RESET + "keyboard(s):\n")
 
 	dev = usb.core.find(find_all=True)
 	# loop through devices, printing vendor and product ids in decimal and hex
@@ -36,24 +36,50 @@ if mode == "config":
 		counter += 1
 
 	print()
+	primaryK = []
 	secondaryK = []
 
 	Path("/etc/EasyKeyboardManager/").mkdir(parents=True, exist_ok=True)
 	outfile = open("/etc/EasyKeyboardManager/config.txt", "w")
+
+	while(len(primaryK) == 0):
+		res = input()
+		res = res.split(" ")
+
+		for el in res:
+			if el.isnumeric() and int(el) > 0 and int(el) < counter:
+				primaryK.append(pairs[int(el)-1])
+
+	print("These are the available USB devices. Pick your" + bcolors.YELLOW + " SECONDARY " + bcolors.RESET + "keyboard(s):\n")
+
+	dev = usb.core.find(find_all=True)
+	counter = 1
+
+	for cfg in dev:
+		manufacturer = usb.util.get_string(cfg, cfg.iManufacturer)
+		product = usb.util.get_string(cfg, cfg.iProduct)
+		if (cfg.idVendor, cfg.idProduct) in primaryK:
+			print(bcolors.RED, end="")
+
+		print(str(counter) + ") - " + str(manufacturer) + " " + str(product))
+		print("\tVID:{:04x}".format(cfg.idVendor) + " PID:{:04x}".format(cfg.idProduct) + bcolors.RESET)
+
+		counter += 1
+
 
 	while(len(secondaryK) == 0):
 		res = input()
 		res = res.split(" ")
 
 		for el in res:
-			if el.isnumeric() and int(el) > 0 and int(el) < counter:
+			if el.isnumeric() and int(el) > 0 and int(el) < counter and (pairs[int(el)-1] not in primaryK):
 				secondaryK.append(pairs[int(el)-1])
 
 	for item in secondaryK:
 		outfile.write("{:04x}".format(item[0]) + ":=:{:04x}".format(item[1]))
 
 	outfile.close()
-	print("\nConfig file saved in /etc/EasyKeyboardManager/config.txt" + bcolors.GREEN + "\nconfiguration procedure complete.\n" + bcolors.RESET)
+	print("\nConfig file saved in /etc/EasyKeyboardManager/config.txt" + bcolors.GREEN + "\nConfiguration procedure complete.\n" + bcolors.RESET)
 
 elif mode == "run":
 	#run normally
@@ -61,3 +87,5 @@ elif mode == "run":
 else:
 	print("\nrunning mode argument passed is not correct.\nNote that the valid arguments are:" + bcolors.YELLOW + "\n\t\u00B7 config\n\t\u00B7 run\n" + bcolors.RESET)
 	sys.exit(2)
+
+	
