@@ -3,12 +3,14 @@ import sys
 import os
 import time
 import keyboard
-import evdev
 
+from evdev import InputDevice, categorize, ecodes
 from termios import tcflush, TCIOFLUSH
 from pathlib import Path
 
-#---- CLASSES ----
+#---- CLASSES AND CONFIGURATIONS----
+
+typing_speed = 0.01
 
 class bcolors:
     GREEN = '\033[92m'
@@ -16,15 +18,13 @@ class bcolors:
     RED = '\033[91m'
     RESET = '\033[0m'
 
-#---- MAIN ----
+#---- CALLBACKS N FUNCTION----
 
-if (len(sys.argv) != 2):	
-	print("\nNo argument passed, terminating.\nNote that once configured, the argument" + bcolors.YELLOW + " \"run\"" + bcolors.RESET + " is required.\n")
-	sys.exit(1)
+def verify_system_integrity(device):
+	if not os.path.exists(device):
+		sys.exit(3)
 
-mode = sys.argv[1]
-
-if mode == "config":
+def config():
 	#execute configuration
 	print(bcolors.GREEN + "\nInitializing configuration procedure .",end="",flush=True)
 	#Fancy startup stuff. Prolly going to remove it
@@ -47,7 +47,6 @@ if mode == "config":
 	mainK = ev.device
 	print("\nSaving " + bcolors.YELLOW + mainK + bcolors.RESET + " as MAIN keyboard")
 
-
 	time.sleep(0.5)
 
 	print("\n\nPress any key on your " + bcolors.RED + "MACRO" + bcolors.RESET + " keyboard")
@@ -68,8 +67,7 @@ if mode == "config":
 	time.sleep(0.5)
 	tcflush(sys.stdin, TCIOFLUSH)
 
-elif mode == "run":	
-	#run normally
+def run():
 	if not os.path.isfile("/etc/EasyKeyboardManager/config.txt"):
 		sys.exit(2)
 
@@ -82,23 +80,61 @@ elif mode == "run":
 	print("main = " + main)
 	print("macro = " + macro)
 
-	escapeSeq = False
+	verify_system_integrity(main)
+	verify_system_integrity(macro)
 
-	while(not escapeSeq):
-		ev = keyboard.read_event(suppress=False)
-		ev = keyboard.read_event(suppress=False)
-		if ev.device == macro:
-			#do something to revert the action and trigger the 
-			keyboard.press_and_release("backspace")
-			print("correct")
+	dev = InputDevice(macro)
+	dev.grab()
 
-		#check exit contidition
-	#	if not os.path.isfile(main) or not os.path.isfile(macro):
-			#one of the keyboard is unplugged
-	#		escapeSeq = True			
+	ctrl = False
+	alt = False
 
+	for event in dev.read_loop():
+		verify_system_integrity(main)
+		verify_system_integrity(macro)
+
+		if event.type == ecodes.EV_KEY:
+			key = categorize(event)
+			
+			if key.keystate == key.key_down and key.keycode == "KEY_LEFTCTRL":
+				ctrl = True
+			elif key.keystate == key.key_up and key.keycode == "KEY_LEFTCTRL":
+				ctrl = False
+
+			if key.keystate == key.key_down and key.keycode == "KEY_LEFTALT":
+				alt = True
+			elif key.keystate == key.key_up and key.keycode == "KEY_LEFTALT":
+				alt = False
+
+			if key.keystate == key.key_down:
+				if key.keycode == 'KEY_DOT':
+					if ctrl and alt:
+						tcflush(sys.stdin, TCIOFLUSH)
+						sys.exit(0)
+				
+				if key.keycode == 'KEY_H':
+					keyboard.write("this is the official test",delay=typing_speed)
+				
+				if key.keycode == 'KEY_G':
+					keyboard.write("git add .",delay=typing_speed)
+					keyboard.press_and_release("enter")
+					keyboard.write("git commit -m 'this is an automated commit.'",delay=typing_speed)
+					keyboard.press_and_release("enter")
+					keyboard.write("git push origin master",delay=typing_speed)
+					keyboard.press_and_release("enter")
+
+
+#---- MAIN ----
+if len(sys.argv) != 2:	
+	print("\nNo argument passed, terminating.\nNote that once configured, the argument" + bcolors.YELLOW + " \"run\"" + bcolors.RESET + " is required.\n")
+	sys.exit(1)
+
+mode = sys.argv[1]
+
+if mode == "config":
+	config()
+elif mode == "run":
+	run()
 else:
 	print("\nrunning mode argument passed is not correct.\nNote that the valid arguments are:" + bcolors.YELLOW + "\n\t\u00B7 config\n\t\u00B7 run\n" + bcolors.RESET)
 	sys.exit(3)
-
-	
