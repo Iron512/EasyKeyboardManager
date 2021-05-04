@@ -116,6 +116,7 @@ def run():
 					keyboard.write("this is the official test",delay=typing_speed)
 				
 				if key.keycode == 'KEY_G':
+					keyboard.write("commit message - ",delay=typing_speed)
 					recorded = keyboard.record(until='enter')
 					
 					keyboard.write("git add .",delay=typing_speed)
