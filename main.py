@@ -122,11 +122,11 @@ def run():
 					keyboard.press_and_release("enter")
 					
 					keyboard.write("git commit -m '",delay=typing_speed)
-					keyboard.play(recorded,speed_factor=10.0)
-					keyboard.write("'",delay=typing_speed)
-					keyboard.press_and_release("enter")
+					keyboard.play(recorded[:-1],speed_factor=10.0)
+					keyboard.press_and_release("'+enter")
 
 					keyboard.write("git push origin master",delay=typing_speed)
+
 					keyboard.press_and_release("enter")
 
 #---- MAIN ----
