@@ -118,8 +118,11 @@ def run():
 				if key.keycode == 'KEY_G':
 					keyboard.write("git add .",delay=typing_speed)
 					keyboard.press_and_release("enter")
-					keyboard.write("git commit -m 'this is an automated commit.'",delay=typing_speed)
-					keyboard.press_and_release("enter")
+					keyboard.write("git commit -m \"",delay=typing_speed)
+					
+					keyboard.wait("enter")
+
+
 					keyboard.write("git push origin master",delay=typing_speed)
 					keyboard.press_and_release("enter")
 
