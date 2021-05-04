@@ -13,10 +13,10 @@ from pathlib import Path
 typing_speed = 0.01
 
 class bcolors:
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    RESET = '\033[0m'
+	GREEN = '\033[92m'
+	YELLOW = '\033[93m'
+	RED = '\033[91m'
+	RESET = '\033[0m'
 
 #---- CALLBACKS N FUNCTION----
 
@@ -116,16 +116,18 @@ def run():
 					keyboard.write("this is the official test",delay=typing_speed)
 				
 				if key.keycode == 'KEY_G':
+					recorded = keyboard.record(until='enter')
+					
 					keyboard.write("git add .",delay=typing_speed)
 					keyboard.press_and_release("enter")
-					keyboard.write("git commit -m \"",delay=typing_speed)
 					
-					keyboard.wait("enter")
-
+					keyboard.write("git commit -m '",delay=typing_speed)
+					keyboard.play(recorded,speed_factor=10.0)
+					keyboard.write("'",delay=typing_speed)
+					keyboard.press_and_release("enter")
 
 					keyboard.write("git push origin master",delay=typing_speed)
 					keyboard.press_and_release("enter")
-
 
 #---- MAIN ----
 if len(sys.argv) != 2:	
