@@ -119,6 +119,8 @@ def run():
 					keyboard.write("commit message - ",delay=typing_speed)
 					recorded = keyboard.record(until='enter')
 					
+					tcflush(sys.stdin, TCIOFLUSH)
+
 					keyboard.write("git add .",delay=typing_speed)
 					keyboard.press_and_release("enter")
 					
