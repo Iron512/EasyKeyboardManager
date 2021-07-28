@@ -1,8 +1,8 @@
 #!/usr/bin/python
 import sys
 import os
-import time
 import keyboard
+import time
 
 from evdev import InputDevice, categorize, ecodes
 from termios import tcflush, TCIOFLUSH
