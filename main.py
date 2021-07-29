@@ -3,6 +3,7 @@ import sys
 import os
 import keyboard
 import time
+import argparse
 
 from evdev import InputDevice, categorize, ecodes
 from termios import tcflush, TCIOFLUSH
@@ -116,33 +117,41 @@ def run():
 					keyboard.write("this is the official test",delay=typing_speed)
 				
 				if key.keycode == 'KEY_G':
-					keyboard.write("commit message - ",delay=typing_speed)
-					recorded = keyboard.record(until='enter')
+					#keyboard.write("commit message - ",delay=typing_speed)
+					#recorded = keyboard.record(until='enter')
 					
-					tcflush(sys.stdin, TCIOFLUSH)
+					#tcflush(sys.stdin, TCIOFLUSH)
 
 					keyboard.write("git add .",delay=typing_speed)
 					keyboard.press_and_release("enter")
 					
 					keyboard.write("git commit -m '",delay=typing_speed)
-					keyboard.play(recorded[:-1],speed_factor=10.0)
-					keyboard.press_and_release("'+enter")
+					#keyboard.play(recorded[:-1],speed_factor=10.0)
+					#keyboard.press_and_release("'+enter")
+					keyboard.wait('enter')
 
 					keyboard.write("git push origin master",delay=typing_speed)
 
 					keyboard.press_and_release("enter")
 
-#---- MAIN ----
-if len(sys.argv) != 2:	
-	print("\nNo argument passed, terminating.\nNote that once configured, the argument" + bcolors.YELLOW + " \"run\"" + bcolors.RESET + " is required.\n")
-	sys.exit(1)
+def test():
+	keyboard.write("test",delay=typing_speed)
 
-mode = sys.argv[1]
 
-if mode == "config":
-	config()
-elif mode == "run":
-	run()
-else:
-	print("\nrunning mode argument passed is not correct.\nNote that the valid arguments are:" + bcolors.YELLOW + "\n\t\u00B7 config\n\t\u00B7 run\n" + bcolors.RESET)
-	sys.exit(3)
+#MAIN
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description = "A basic implementation of the smith-waterman algorithm for the local alignment.\nThis code has been developed as part of the final exam of the course of Algorithms for Bioinformatics 2020/2021, University of Trento",formatter_class=argparse.RawTextHelpFormatter)
+	parser.add_argument("mode", help="Decide whether to run or config the environment\n", choices=['config', 'run', 'configrun'])
+	
+	args = parser.parse_args()
+	mode = args.mode
+
+	if (mode == 'config'):
+		config()
+	elif (mode == 'run'):
+		run()
+	elif (mode == 'configrun'):
+		config()
+		run()
+	else:
+		print("wtf?")
