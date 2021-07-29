@@ -125,11 +125,13 @@ def run():
 					keyboard.write("git add .",delay=typing_speed)
 					keyboard.press_and_release("enter")
 					
-					keyboard.write("git commit -m",delay=typing_speed)
+					keyboard.write("git commit -m '",delay=typing_speed)
 					#keyboard.play(recorded[:-1],speed_factor=10.0)
 					keyboard.wait("enter")
 					keyboard.press_and_release("'")
+					time.sleep(0.1)
 					keyboard.press_and_release("enter")
+					time.sleep(0.1)
 
 					keyboard.write(" git push origin master",delay=typing_speed)
 					keyboard.press_and_release("enter")
