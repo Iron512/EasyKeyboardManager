@@ -129,9 +129,9 @@ def run():
 					#keyboard.play(recorded[:-1],speed_factor=10.0)
 					keyboard.wait("enter")
 					keyboard.press_and_release("'")
-					time.sleep(0.1)
-					keyboard.press_and_release("enter")
-					time.sleep(0.1)
+					time.sleep(0.02)
+					keyboard.pressand_release("enter")
+					time.sleep(0.02)
 
 					keyboard.write(" git push origin master",delay=typing_speed)
 					keyboard.press_and_release("enter")
